@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Platform/BasePlatform.h"
+#include "BasePlatform.h"
 #include "MovingPlatform.generated.h"
 
 /**
