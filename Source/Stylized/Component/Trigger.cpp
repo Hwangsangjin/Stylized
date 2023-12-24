@@ -2,6 +2,7 @@
 
 
 #include "Component/Trigger.h"
+#include "Component/Mover.h"
 
 // Sets default values for this component's properties
 UTrigger::UTrigger()
@@ -30,12 +31,24 @@ void UTrigger::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 	AActor* Actor = GetAcceptableActor();
 	if (Actor)
 	{
-		UE_LOG(LogTemp, Display, TEXT("Unlocking"));
+		UPrimitiveComponent* Component = Cast<UPrimitiveComponent>(Actor->GetRootComponent());
+		if (Component)
+		{
+			Component->SetSimulatePhysics(false);
+		}
+
+		Actor->AttachToComponent(this, FAttachmentTransformRules::KeepWorldTransform);
+		Mover->SetShouldMove(true);
 	}
 	else
 	{
-		UE_LOG(LogTemp, Display, TEXT("Relocking"));
+		Mover->SetShouldMove(false);
 	}
+}
+
+void UTrigger::SetMover(UMover* NewMover)
+{
+	Mover = NewMover;
 }
 
 AActor* UTrigger::GetAcceptableActor() const
@@ -45,7 +58,9 @@ AActor* UTrigger::GetAcceptableActor() const
 
 	for (const auto& Actor : Actors)
 	{
-		if (Actor->ActorHasTag(AcceptableActorTag))
+		bool bHasAcceptableTag = Actor->ActorHasTag(AcceptableActorTag);
+		bool bIsGrabbed = Actor->ActorHasTag("Grabbed");
+		if (bHasAcceptableTag && !bIsGrabbed)
 		{
 			return Actor;
 		}
